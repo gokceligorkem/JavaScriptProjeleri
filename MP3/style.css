@@ -1,0 +1,25 @@
+body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+
+.container{    
+    width: 400px;
+  
+}
+
+
+#progress .times #controls,
+.card-footer,
+.volume-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+li.playing{
+    background-color: blue;
+    color: white;
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="container">
+    <div class="card-body">
+    <span class="text-center ">Ülke ismi giriniz  </span>
+    <input class="input-group-sm" id="searchtext" type="text" >
+    <button id="search" class="btn btn-primary">Ara</button>
+</div>
+    </div>
+    <div class="container ">
+        <div class="row"></div>
+        <div class="card mb-3" id="country-details">
+        
+        </div>
+        <div class="card mb-3">
+            <div class="card-header ">Komşu Ülkeler</div>
+            <div class="card-body">
+                <div class="row " id="neighbors">
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <script> 
+    const btn=document.querySelector("#search")
+    const txt=document.querySelector("#searchtext")
+    const rw=document.querySelector(".row")
+
+    function displayCountery(countery){
+        const request=new XMLHttpRequest();
+        request.open('GET','https://restcountries.com/v3.1/name/' + countery);
+        request.send();
+
+        request.addEventListener('load',function(){
+        const data=JSON.parse(this.responseText)
+        setCounter(data)
+        
+
+        
+        const request2=new XMLHttpRequest();
+        const counteries=data[0].borders.toString();
+        request2.open('GET','https://restcountries.com/v3.1/alpha?codes='+counteries);
+        request2.send();
+        request2.addEventListener('load',function(){
+            const data=JSON.parse(this.responseText)
+            renderNeighbors(data);
+        })
+    })
+    }
+  
+   function setCounter(data){
+    console.log(data)
+    for(let country of data){
+        let html=`             
+            <div class="card border-success mb-3" style="max-width: 18rem;">
+                
+            <div class="card-body text-success">
+            <h5 class="card-title">${country.name.common}</h5>
+            <img src="${country.flags.png}" class="img-fluid">
+            </div>
+            <div class="card-footer bg-transparent border-success">
+             <ul class="list-group list-group-flush">
+            <li class="list-group-item"> Nüfus: ${(country.population/1000000).toFixed(1)} </li>
+            <li class="list-group-item">Başkent: ${country.capital}  </li>
+            <li class="list-group-item">Dil:${Object.values(country.languages)}  </li>
+            <li class="list-group-item">Para: ${Object.values(country.currencies)[0].name} ${Object.values(country.currencies)[0].symbol}</li>
+
+
+            </ul> 
+            </div>
+            </div>
+        `;
+        document.querySelector(".container .row").insertAdjacentHTML("beforeend",html);
+    }
+       
+    }
+    btn.addEventListener("click",function(){
+        rw.innerHTML = "";
+        const searchText = txt.value;
+        displayCountery(searchText)
+    })
+    function renderNeighbors(data) {
+        console.log(data);
+        let html = "";
+        for(let country of data) {
+            html += `
+                <div class="w-25 h-25 ">
+                    <div class="card height:250px">
+                        <img  src="${country.flags.png}" class="card-img-top w-25 height:250px;">
+                        <div class="card-body">
+                            <h6 class="card-title">${country.name.common}</h6>
+                            <li class="list-group-item">Para: ${Object.values(country.currencies)[0].name} ${Object.values(country.currencies)[0].symbol}</li>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+        }
+        
+        document.querySelector("#neighbors").insertAdjacentHTML("beforeend",html);
+    }
+    </script>
+</body>
+</html>
